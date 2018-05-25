@@ -3,6 +3,7 @@ package ftims.security.unsecure.app.unsecureApp.controller;
 import ftims.security.unsecure.app.unsecureApp.model.AuthForm;
 import ftims.security.unsecure.app.unsecureApp.service.SessionComponent;
 import ftims.security.unsecure.app.unsecureApp.service.UserService;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,7 +27,7 @@ public class StartController {
 
     @GetMapping("/start")
     public String hello(Model model) {
-        if(sessionComponent != null && sessionComponent.getLogged()) {
+        if(sessionComponent != null && BooleanUtils.isTrue(sessionComponent.getLogged())) {
             model.addAttribute("name", sessionComponent.getUser().getUsername());
 
             return "start";
