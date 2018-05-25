@@ -1,6 +1,9 @@
 package ftims.security.unsecure.app.unsecureApp.controller;
 
 import ftims.security.unsecure.app.unsecureApp.model.AuthForm;
+import ftims.security.unsecure.app.unsecureApp.model.Comment;
+import ftims.security.unsecure.app.unsecureApp.model.CommentForm;
+import ftims.security.unsecure.app.unsecureApp.service.CommentService;
 import ftims.security.unsecure.app.unsecureApp.service.SessionComponent;
 import ftims.security.unsecure.app.unsecureApp.service.UserService;
 import org.apache.commons.lang3.BooleanUtils;
@@ -25,11 +28,15 @@ public class StartController {
     @Autowired
     SessionComponent sessionComponent;
 
+    @Autowired
+    CommentService commentService;
+
     @GetMapping("/start")
     public String hello(Model model) {
         if(sessionComponent != null && BooleanUtils.isTrue(sessionComponent.getLogged())) {
             model.addAttribute("name", sessionComponent.getUser().getUsername());
-
+            model.addAttribute("commentForm", new CommentForm());
+            model.addAttribute("comments", commentService.findAllComments());
             return "start";
         }
         return "redirect:/login";
@@ -48,6 +55,16 @@ public class StartController {
     public String getLogin(Model model) {
         model.addAttribute("loginForm", new AuthForm());
         return "login";
+    }
+
+    @RequestMapping(value = "/comment", method = RequestMethod.POST)
+    public String setNewComment(@Valid @ModelAttribute(name = "commentForm") CommentForm commentForm, BindingResult bindingResult, Model model){
+
+        Comment comment = new Comment();
+        comment.setContent(commentForm.getContent());
+        comment.setUsername(sessionComponent.getUser().getUsername());
+        commentService.setNewComment(comment);
+        return "redirect:/start";
     }
 
     @GetMapping("/")
